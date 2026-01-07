@@ -682,23 +682,3 @@ docker-compose logs -f api
 # Restart API service
 docker-compose restart api
 ```
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📧 Support
-
-For issues and questions, please open an issue on GitHub.
-
----
-
-**Built with ❤️ for learning fintech development**
