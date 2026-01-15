@@ -75,13 +75,31 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <Link
-        to="/dashboard/transactions"
-        className="button"
-        style={{ display: "inline-block", textDecoration: "none" }}
-      >
-        View Transactions
-      </Link>
+      <div style={{ marginTop: 16 }}>
+        <Link
+          to="/dashboard/transactions"
+          className="button"
+          style={{ display: "inline-block", textDecoration: "none", marginRight: 8 }}
+        >
+          View Transactions
+        </Link>
+
+        <Link
+          to="/dashboard/docs"
+          className="button"
+          style={{ display: "inline-block", textDecoration: "none", marginRight: 8 }}
+        >
+          Docs
+        </Link>
+
+        <Link
+          to="/dashboard/webhooks"
+          className="button"
+          style={{ display: "inline-block", textDecoration: "none" }}
+        >
+          Webhooks
+        </Link>
+      </div>
     </div>
   );
 }

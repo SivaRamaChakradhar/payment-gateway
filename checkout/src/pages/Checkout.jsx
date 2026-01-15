@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 
+function sendToParent(type, data) {
+  window.parent.postMessage({ type, data }, '*');
+}
+
 export default function Checkout() {
   const [order, setOrder] = useState(null);
   const [method, setMethod] = useState("");
@@ -9,6 +13,27 @@ export default function Checkout() {
 
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("order_id");
+  const isEmbedded = params.get("embedded") === "true";
+
+  async function createTestOrder() {
+    try {
+      setError("");
+      const res = await fetch("http://localhost:8000/api/v1/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Api-Key": "key_test_abc123", "X-Api-Secret": "secret_test_xyz789" },
+        body: JSON.stringify({ amount: 50000, currency: "INR", receipt: "test_receipt" })
+      });
+
+      const data = await res.json();
+      if (data.id) {
+        window.location.href = `/checkout?order_id=${data.id}`;
+      } else {
+        setError("Failed to create test order");
+      }
+    } catch (err) {
+      setError("Error creating test order: " + err.message);
+    }
+  }
 
   useEffect(() => {
     async function loadOrder() {
@@ -33,8 +58,6 @@ export default function Checkout() {
 
     if (orderId) {
       loadOrder();
-    } else {
-      setError("No order ID provided");
     }
   }, [orderId]);
 
@@ -137,12 +160,22 @@ export default function Checkout() {
 
         if (data.status === "success") {
           clearInterval(interval);
-          window.location.href = "/success";
+          
+          if (isEmbedded) {
+            sendToParent('payment_success', { paymentId: data.id });
+          } else {
+            window.location.href = "/success";
+          }
         }
 
         if (data.status === "failed") {
           clearInterval(interval);
-          window.location.href = "/failure";
+          
+          if (isEmbedded) {
+            sendToParent('payment_failed', { error: data.error_description });
+          } else {
+            window.location.href = "/failure";
+          }
         }
       } catch (err) {
         console.error("Poll error:", err);
@@ -159,7 +192,21 @@ export default function Checkout() {
       )}
 
       {!order ? (
-        <p>{error ? "Failed to load order" : "Loading..."}</p>
+        !orderId ? (
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <h2>Create a Test Order</h2>
+            <p>No order ID provided. Create a test order to proceed.</p>
+            <button 
+              onClick={createTestOrder}
+              style={{ padding: "10px 20px", fontSize: "16px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px" }}
+              data-test-id="create-test-order"
+            >
+              Create Test Order (₹500)
+            </button>
+          </div>
+        ) : (
+          <p>{error ? "Failed to load order" : "Loading..."}</p>
+        )
       ) : (
         <>
           {/* ORDER SUMMARY */}

@@ -53,7 +53,9 @@ export default function Transactions() {
             >
               <td data-test-id="payment-id">{p.id}</td>
               <td data-test-id="order-id">{p.order_id}</td>
-              <td data-test-id="amount">{p.amount}</td>
+              <td data-test-id="amount">
+                ₹{(p.amount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
               <td data-test-id="method">{p.method}</td>
               <td
                 data-test-id="status"

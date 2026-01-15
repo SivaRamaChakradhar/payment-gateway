@@ -1,20 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 import "../styles/login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
 
-    // Deliverable allows ANY password — but email must match test merchant
     if (email === "test@example.com") {
-      localStorage.setItem("merchantEmail", email);
-      navigate("/dashboard");
+      login(email);
+    } else {
+      setError("Invalid email. Use: test@example.com");
     }
   };
 
@@ -23,26 +32,28 @@ export default function Login() {
       <div className="login-box">
         <h2>Merchant Login</h2>
 
-        <form data-test-id="login-form" onSubmit={handleSubmit}>
+        {error && (
+          <div style={{ color: "red", marginBottom: "15px" }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           <input
-            data-test-id="email-input"
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
-
           <input
-            data-test-id="password-input"
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-
-          <button className="button" data-test-id="login-button">
-            Login
-          </button>
+          <button className="button">Login</button>
         </form>
       </div>
     </div>

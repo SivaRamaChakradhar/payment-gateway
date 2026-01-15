@@ -8,14 +8,39 @@ const seedTestMerchant = require("./services/seedService");
 const testRoutes = require("./routes/testRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const webhookRoutes = require("./routes/webhookRoutes");
 
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+/**
+ * ROOT ROUTE - API Information
+ */
+app.get("/", (req, res) => {
+  res.json({
+    name: "Payment Gateway API",
+    version: "1.0.0",
+    status: "running",
+    documentation: "http://localhost:3000/dashboard/docs",
+    endpoints: {
+      health: "GET /health",
+      test: "GET /api/v1/test/merchant",
+      jobs: "GET /api/v1/test/jobs/status",
+      orders: "POST /api/v1/orders",
+      payments: "GET/POST /api/v1/payments",
+      webhooks: "POST /api/v1/webhooks"
+    }
+  });
+});
+
+app.use("/api/v1/test", testRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payments", paymentRoutes);
+app.use("/api/v1/webhooks", webhookRoutes);
+app.use("/api/v1/refunds", paymentRoutes); // Refund routes are in paymentRoutes
 
 /**
  * Initialize DB + seed test merchant
